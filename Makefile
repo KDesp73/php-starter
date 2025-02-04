@@ -1,8 +1,9 @@
+DIST=dist
 .DEFAULT_GOAL := help
 
 .PHONY: start
 start: ## Start the php server
-	docker-compose up -d
+	docker-compose up -d --remove-orphans
 
 .PHONY: stop
 stop: ## Stop the php server
@@ -20,13 +21,16 @@ logs: ## Print logs
 clean: ## Clean docker environment
 	docker system prune -f
 
-.PHONY: setup
-setup: ## Install dependencies
-	npm install
+.PHONY: dist
+dist: ## Create a distribution directory
+	mkdir -p $(DIST)
+	cp -r ./src/public/* $(DIST)
+	cp -r ./src/php $(DIST)
+	cp ./src/config.json $(DIST)/config.json
 
-.PHONY: live
-live: ## Start live server
-	browser-sync start --proxy "localhost:8080" --files "src/**/*" --no-cache
+.PHONY: distclean
+distclean: ## Clean the distribution
+	rm -rf $(DIST)
 
 .PHONY: help
 help: ## Show this help message
